@@ -1,36 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>My Game</title>
-
-  <!-- iOS PWA -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="My Game" />
-  <meta name="theme-color" content="#ff6b35" />
-
-  <style>
-    body {
-      margin: 0;
-      background: #fff4e6;
-      font-family: Georgia, serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100dvh;
-      color: #2d1a0e;
-    }
-
-    h1 {
-      font-style: italic;
-      font-size: 2rem;
-      color: #ff6b35;
-    }
-  </style>
-</head>
-<body>
-  <h1>My Game</h1>
-</body>
-</html>
+  <head>
+      <meta charset="UTF-8">
+      <title>Starlight Sweets & Boutique</title>
+    <style>
+          @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+          body { margin: 0; overflow: hidden; background: #1a0b2e; color: #fff; font-family: 'Fredoka One', cursive, sans-serif; }
+          #gameCanvas { display: block; width: 100vw; height: 100vh; }
+          #ui { position: absolute; top: 20px; left: 20px; pointer-events: none; }
+          .title { font-size: 32px; color: #ff9ee2; text-shadow: 0 0 10px #ff9ee2; margin: 0 0 5px 0; }
+          .subtitle { font-size: 16px; color: #8be9fd; text-shadow: 0 0 5px #8be9fd; margin: 0 0 20px 0; }
+          .score { font-size: 24px; color: #f1fa8c; text-shadow: 0 0 5px #f1fa8c; }
+        </style>
+  </head>
+  <body>
+      <div id="ui">
+            <div class="title">Starlight Sweets & Boutique</div>div>
+            <div class="subtitle">Catch the Bedhead Aliens with Bubblegum Goo!</div>div>
+            <div class="score">Aliens Revitalized: <span id="scoreText">0</span>span></div>div>
+      </div>div>
+      <canvas id="gameCanvas"></canvas>canvas>
+      <script>
+            const canvas=document.getElementById('gameCanvas');const ctx=canvas.getContext('2d');let width=canvas.width=window.innerWidth;let height=canvas.height=window.innerHeight;window.addEventListener('resize',()=>{width=canvas.width=window.innerWidth;height=canvas.height=window.innerHeight;});let score=0;const scoreText=document.getElementById('scoreText');const player={x:width/2,y:height/2,radius:25,speed:5,dx:0,dy:0,color:'#8be9fd',jacketColor:'#ff79c6'};const keys={};window.addEventListener('keydown',e=>keys[e.key]=true);window.addEventListener('keyup',e=>keys[e.key]=false);const bullets=[],aliens=[],puffles=[],particles=[];const puffleColors=['#ffb86c','#ff79c6','#8be9fd','#50fa7b'];for(let i=0;i<5;i++){puffles.push({x:Math.random()*width,y:Math.random()*height,radius:15,vx:(Math.random()-0.5)*2,vy:(Math.random()-0.5)*2,color:puffleColors[Math.floor(Math.random()*puffleColors.length)],bounceOffset:Math.random()*Math.PI*2});}function spawnAlien(){let x,y;if(Math.random()<0.5){x=Math.random()<0.5?-30:width+30;y=Math.random()*height;}else{x=Math.random()*width;y=Math.random()<0.5?-30:height+30;}aliens.push({x,y,radius:20,vx:(Math.random()-0.5)*2,vy:(Math.random()-0.5)*2,color:'#bd93f9',state:'wandering',trapProgress:0});}setInterval(spawnAlien,2000);window.addEventListener('mousedown',e=>{const angle=Math.atan2(e.clientY-player.y,e.clientX-player.x);bullets.push({x:player.x,y:player.y,vx:Math.cos(angle)*10,vy:Math.sin(angle)*10,radius:8,color:'#ff9ee2',life:100});});function drawCircle(x,y,r,color,fill=true){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);if(fill){ctx.fillStyle=color;ctx.fill();}else{ctx.strokeStyle=color;ctx.lineWidth=3;ctx.stroke();}}function update(){ctx.fillStyle='#1a0b2e';ctx.fillRect(0,0,width,height);ctx.fillStyle='#ffffff';for(let i=0;i<50;i++){ctx.fillRect((i*137)%width,(i*251)%height,2,2);}puffles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>width)p.vx*=-1;if(p.y<0||p.y>height)p.vy*=-1;p.bounceOffset+=0.1;const bounceY=p.y+Math.sin(p.bounceOffset)*5;ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(p.x,p.y+15,10,4,0,0,Math.PI*2);ctx.fill();drawCircle(p.x,bounceY,p.radius,p.color);drawCircle(p.x-5,bounceY-2,3,'#000');drawCircle(p.x+5,bounceY-2,3,'#000');drawCircle(p.x-5,bounceY-3,1,'#fff');drawCircle(p.x+5,bounceY-3,1,'#fff');});player.dx=0;player.dy=0;if(keys['w']||keys['ArrowUp'])player.dy=-player.speed;if(keys['s']||keys['ArrowDown'])player.dy=player.speed;if(keys['a']||keys['ArrowLeft'])player.dx=-player.speed;if(keys['d']||keys['ArrowRight'])player.dx=player.speed;player.x+=player.dx;player.y+=player.dy;player.x=Math.max(player.radius,Math.min(width-player.radius,player.x));player.y=Math.max(player.radius,Math.min(height-player.radius,player.y));ctx.fillStyle='rgba(0,0,0,0.5)';ctx.beginPath();ctx.ellipse(player.x,player.y+20,15,6,0,0,Math.PI*2);ctx.fill();drawCircle(player.x,player.y,player.radius,player.color);ctx.fillStyle=player.jacketColor;ctx.fillRect(player.x-20,player.y+5,40,15);ctx.strokeStyle=player.color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(player.x-10,player.y-15);ctx.lineTo(player.x-15,player.y-30);ctx.stroke();ctx.beginPath();ctx.moveTo(player.x+10,player.y-15);ctx.lineTo(player.x+15,player.y-30);ctx.stroke();drawCircle(player.x-15,player.y-30,4,player.color);drawCircle(player.x+15,player.y-30,4,player.color);drawCircle(player.x-8,player.y-5,4,'#000');drawCircle(player.x+8,player.y-5,4,'#000');drawCircle(player.x-8,player.y-6,1.5,'#fff');drawCircle(player.x+8,player.y-6,1.5,'#fff');for(let i=bullets.length-1;i>=0;i--){const b=bullets[i];b.x+=b.vx;b.y+=b.vy;b.life--;ctx.save();ctx.globalAlpha=b.life/100;ctx.shadowBlur=10;ctx.shadowColor=b.color;drawCircle(b.x,b.y,b.radius,b.color);drawCircle(b.x-2,b.y-2,2,'rgba(255,255,255,0.8)');ctx.restore();if(b.life<=0)bullets.splice(i,1);}for(let i=aliens.length-1;i>=0;i--){const a=aliens[i];if(a.state==='wandering'){a.x+=a.vx;a.y+=a.vy;if(a.x<-50||a.x>width+50)a.vx*=-1;if(a.y<-50||a.y>height+50)a.vy*=-1;for(let j=bullets.length-1;j>=0;j--){const b=bullets[j];if(Math.hypot(a.x-b.x,a.y-b.y)<a.radius+b.radius){a.state='trapped';a.trapProgress=0;bullets.splice(j,1);break;}}}else if(a.state==='trapped'){a.trapProgress+=0.02;a.y-=1;if(a.trapProgress>=1){score++;scoreText.innerText=score;for(let k=0;k<10;k++){particles.push({x:a.x,y:a.y,vx:(Math.random()-0.5)*5,vy:(Math.random()-0.5)*5,life:30,color:'#f1fa8c'});}aliens.splice(i,1);continue;}}ctx.fillStyle='rgba(0,0,0,0.5)';ctx.beginPath();ctx.ellipse(a.x,a.y+a.radius,12,5,0,0,Math.PI*2);ctx.fill();drawCircle(a.x,a.y,a.radius,a.color);ctx.strokeStyle='#6272a4';ctx.lineWidth=3;for(let d=180;d<360;d+=30){let r=d*Math.PI/180;ctx.beginPath();ctx.moveTo(a.x+Math.cos(r)*a.radius,a.y+Math.sin(r)*a.radius);ctx.lineTo(a.x+Math.cos(r)*(a.radius+10),a.y+Math.sin(r)*(a.radius+15));ctx.stroke();}if(a.state==='wandering'){ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(a.x-10,a.y-8);ctx.lineTo(a.x-2,a.y-4);ctx.stroke();ctx.beginPath();ctx.moveTo(a.x+10,a.y-8);ctx.lineTo(a.x+2,a.y-4);ctx.stroke();drawCircle(a.x-6,a.y,2,'#000');drawCircle(a.x+6,a.y,2,'#000');}else{ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(a.x-8,a.y);ctx.quadraticCurveTo(a.x-5,a.y-5,a.x-2,a.y);ctx.stroke();ctx.beginPath();ctx.moveTo(a.x+8,a.y);ctx.quadraticCurveTo(a.x+5,a.y-5,a.x+2,a.y);ctx.stroke();}if(a.state==='trapped'){ctx.save();ctx.globalAlpha=0.5;ctx.shadowBlur=20;ctx.shadowColor='#ff9ee2';drawCircle(a.x,a.y,a.radius+10+(Math.sin(a.trapProgress*10)*3),'#ff9ee2');ctx.restore();drawCircle(a.x-15,a.y-15,5,'rgba(255,255,255,0.7)');}}for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.life--;ctx.globalAlpha=p.life/30;drawCircle(p.x,p.y,3,p.color);ctx.globalAlpha=1;if(p.life<=0)particles.splice(i,1);}requestAnimationFrame(update);}update();
+      </script>
+  </body>
+</html>html>
+      </script>
+  </body>
+    </style></title>
+  </head>
